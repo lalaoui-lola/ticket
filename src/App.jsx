@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabase'
 import Login from './components/Login'
-import Sidebar from './components/Layout/Sidebar'
-import Header from './components/Layout/Header'
+import Layout from './components/Layout/Layout'
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
 import Tickets from './pages/Tickets'
+import { requestNotificationPermission } from './utils/desktopNotifications'
 
 function App() {
   const [session, setSession] = useState(null)
   const [userProfile, setUserProfile] = useState(null)
   const [currentPage, setCurrentPage] = useState('dashboard')
   const [loading, setLoading] = useState(true)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
 
   useEffect(() => {
+    // Demander la permission des notifications dès le chargement
+    const enableNotifications = async () => {
+      const enabled = await requestNotificationPermission();
+      setNotificationsEnabled(enabled);
+      
+      if (enabled) {
+        console.log('Notifications de bureau activées');
+      } else {
+        console.log('Notifications de bureau désactivées ou non supportées');
+      }
+    };
+    
+    enableNotifications();
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       if (session) {
@@ -117,19 +132,29 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 flex">
-      <Sidebar
-        userRole={userProfile.role}
-        currentPage={currentPage}
-        onNavigate={setCurrentPage}
-      />
-      <div className="flex-1 flex flex-col min-h-screen lg:ml-0">
-        <Header user={userProfile} />
-        <main className="flex-1 p-6">
-          {renderPage()}
-        </main>
-      </div>
-    </div>
+    <Layout 
+      user={userProfile}
+      currentPage={currentPage}
+      onNavigate={setCurrentPage}
+    >
+      {!notificationsEnabled && (
+        <div className="mb-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg text-yellow-800">
+          <p className="font-medium">
+            Pour recevoir des notifications sur votre bureau (près de l'horloge), veuillez activer les notifications dans votre navigateur.
+            <button 
+              className="ml-4 px-3 py-1 bg-yellow-500 text-white rounded-lg text-sm font-bold"
+              onClick={async () => {
+                const enabled = await requestNotificationPermission();
+                setNotificationsEnabled(enabled);
+              }}
+            >
+              Activer
+            </button>
+          </p>
+        </div>
+      )}
+      {renderPage()}
+    </Layout>
   )
 }
 

@@ -35,15 +35,15 @@ export default function Sidebar({ userRole, currentPage, onNavigate }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar - Now with sticky positioning */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-200 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-200 overflow-y-auto transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-neutral-200">
+          <div className="sticky top-0 z-10 bg-white p-6 border-b border-neutral-200">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-br from-primary-500 to-primary-800 p-2 rounded-lg">
                 <Ticket className="h-6 w-6 text-white" strokeWidth={2.5} />
@@ -80,8 +80,8 @@ export default function Sidebar({ userRole, currentPage, onNavigate }) {
             })}
           </nav>
 
-          {/* Logout button */}
-          <div className="p-4 border-t border-neutral-200">
+          {/* Logout button - Sticky at bottom */}
+          <div className="sticky bottom-0 bg-white p-4 border-t border-neutral-200">
             <button
               onClick={handleLogout}
               className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold text-accent-600 hover:bg-accent-50 transition-all duration-200"
